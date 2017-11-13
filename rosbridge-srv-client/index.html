@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="ROSBridge Connection for distributed Deep Learning">
+  <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+  <meta itemprop="description" content="Client-side Camera Stream">
+  <meta itemprop="name" content="Web Camera Stream Classifier">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <script src="lib/eventemitter2.min.js"></script>
+  <script src="lib/roslib.min.js"></script>
+  <script src="lib/three.min.js"></script>
+  <script src="lib/adapter-latest.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div class="select">
+      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+      <label for="serviceSource">Service: </label><select id="serviceSource"></select>
+    </div>
+    <video autoplay id="video"></video>
+    <canvas style="display: none;" id="canvas"></canvas>
+    <canvas id="output"></canvas>
+    <button id="startstop" style="outline-width: 0; background-color: transparent; border: none"><img id="startstopicon" src=""/></button>
+    <p id="output_json"></p>
+  </div>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

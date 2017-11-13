@@ -1,0 +1,16 @@
+{
+  "name": "rosbridge-srv-client",
+  "version": "1.0.0",
+  "description": "Client-Wepp-App for Tensorflow-ROS-Service Visualization",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esahin90/ros-tensorflow-srv.git"
+  },
+  "author": "Emre Sahin <emre.tr@outlook.com>",
+  "license": "Apache 2.0"
+}

@@ -1,0 +1,4 @@
+sensor_msgs/CompressedImage raw
+---
+sensor_msgs/CompressedImage result
+string json_string
