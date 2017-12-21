@@ -24,6 +24,29 @@ var detectObjectsClient = new ROSLIB.Service({
   ros : ros
 });
 
+var detectionServicesByTopic = [
+  {
+    name: '/rostensorflow/detect_object/by_topic/image',
+    serviceType: 'rostensorflow/ImageDetectionByTopic'
+  },
+  {
+    name: '/rostensorflow/detect_object/by_topic/json',
+    serviceType: 'rostensorflow/JSONDetectionByTopic'
+  },
+  {
+    name: '/rostensorflow/detect_object/by_topic/labeled_json',
+    serviceType: 'rostensorflow/JSONDetectionByTopic'
+  },
+  {
+    name: '/rostensorflow/detect_object/by_topic/all',
+    serviceType: 'rostensorflow/DetectAllByTopic'
+  },
+  {
+    name: '/rostensorflow/detect_object/by_topic/all_with_label',
+    serviceType: 'rostensorflow/DetectAllByTopic'
+  }
+];
+
 var detectionServices = [
   {
     name: '/rostensorflow/detect_object/image',
@@ -47,14 +70,6 @@ var detectionServices = [
   }
 ];
 
-var imageMessage = new ROSLIB.Message({
-  format: "jpeg"
-});
-
-var req = new ROSLIB.ServiceRequest({
-  raw : imageMessage
-});
-
 document.getElementById('startstopicon').setAttribute('src', RECORD_OFF);
 
 var hasRunOnce = false,
@@ -64,12 +79,26 @@ var hasRunOnce = false,
   output_json = document.querySelector('p#output_json'),
   videoSelect = document.querySelector('select#videoSource'),
   serviceSelect = document.querySelector('select#serviceSource'),
+  topicCheck = document.querySelector('input#topicCheck'),
+  topicSource = document.querySelector('input#topicSource'),
   selectors = [videoSelect],
   srv_selector = [serviceSelect],
   image = new Image(),
   width = 640,
   height,
   cameraTimer;
+
+  var imageMessage = new ROSLIB.Message({
+    format: "jpeg"
+  });
+
+  var req = new ROSLIB.ServiceRequest({
+    raw : imageMessage
+  });
+
+  var reqByTopic = new ROSLIB.ServiceRequest({
+    topic: ""
+  });
 
 function gotDevices(deviceInfos) {
   var values = selectors.map(function(select) {
@@ -150,21 +179,31 @@ function cameraOn() {
     });
   }
   var videoSource = videoSelect.value;
-  detectObjectsClient.name = detectionServices[serviceSelect.value].name;
-  detectObjectsClient.serviceType = detectionServices[serviceSelect.value].serviceType;
-  if (detectObjectsClient.serviceType === 'rostensorflow/ImageDetection'){
+
+  if (serviceSelect.value === 0){
     output_json.innerHTML = "";
   }
-  var constraints = {
-    audio: false,
-    video: {
-      deviceId: videoSource ? {
-        exact: videoSource
-      } : undefined
-    }
-  };
-  navigator.mediaDevices.getUserMedia(constraints).
-  then(gotStream).then(gotDevices).catch(handleError);
+
+  if (topicCheck.checked != true) {
+    video.style.display = "block";
+    detectObjectsClient.name = detectionServices[serviceSelect.value].name;
+    detectObjectsClient.serviceType = detectionServices[serviceSelect.value].serviceType;
+
+    var constraints = {
+      audio: false,
+      video: {
+        deviceId: videoSource ? {
+          exact: videoSource
+        } : undefined
+      }
+    };
+    navigator.mediaDevices.getUserMedia(constraints).
+    then(gotStream).then(gotDevices).catch(handleError);
+  } else {
+    video.style.display = "none";
+    detectObjectsClient.name = detectionServicesByTopic[serviceSelect.value].name;
+    detectObjectsClient.serviceType = detectionServicesByTopic[serviceSelect.value].serviceType;
+  }
 }
 
 function cameraOff() {
@@ -197,15 +236,35 @@ function takepicture() {
 
   imageMessage.data = canvas.toDataURL('image/jpeg').replace("data:image/jpeg;base64,", "");
 
-  detectObjectsClient.callService(req, function(resp) {
-    if (resp.result) {
-      image.src = "data:image/" + resp.result.format +";base64," + resp.result.data;
-    }
-    if (resp.json_string) {
-      output_json.innerHTML = resp.json_string;
-    }
-  });
+  if (topicCheck.checked != true) {
+    detectObjectsClient.callService(req, function(resp) {
+      if (resp.result) {
+        image.src = "data:image/" + resp.result.format +";base64," + resp.result.data;
+      }
+      if (resp.json_string) {
+        output_json.innerHTML = resp.json_string;
+      }
+    });
+  } else {
+    reqByTopic.topic = topicSource.value
+    detectObjectsClient.callService(reqByTopic, function(resp) {
+      if (resp.result) {
+        image.src = "data:image/" + resp.result.format +";base64," + resp.result.data;
+      }
+      if (resp.json_string) {
+        output_json.innerHTML = resp.json_string;
+      }
+    });
+  }
 }
+
+topicCheck.addEventListener('click', function(ev){
+  if (topicCheck.checked != true) {
+    topicSource.disabled = true;
+  } else {
+    topicSource.disabled = false;
+  }
+}, false);
 
 startstopicon.addEventListener('click', function(ev) {
   if (cameraTimer == null) {

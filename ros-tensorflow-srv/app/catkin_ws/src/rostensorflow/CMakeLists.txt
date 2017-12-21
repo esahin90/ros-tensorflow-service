@@ -58,8 +58,11 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   ImageDetection.srv
+  ImageDetectionByTopic.srv
   JSONDetection.srv
+  JSONDetectionByTopic.srv
   DetectAll.srv
+  DetectAllByTopic.srv
 )
 
 ## Generate actions in the 'action' folder

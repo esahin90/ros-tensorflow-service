@@ -20,11 +20,14 @@
     <div class="select">
       <label for="videoSource">Video source: </label><select id="videoSource"></select>
       <label for="serviceSource">Service: </label><select id="serviceSource"></select>
+      <input type="checkbox" id="topicCheck"><label for="topicSource">Topic: </label><input type="text" id="topicSource" value="topicname" disabled>
     </div>
-    <video autoplay id="video"></video>
-    <canvas style="display: none;" id="canvas"></canvas>
-    <canvas id="output"></canvas>
     <button id="startstop" style="outline-width: 0; background-color: transparent; border: none"><img id="startstopicon" src=""/></button>
+    <div class="videoDisplay">
+      <video style="display: none;" autoplay id="video"></video>
+      <canvas style="display: none;" id="canvas"></canvas>
+      <canvas id="output"></canvas>
+    </div>
     <p id="output_json"></p>
   </div>
   <script src="js/main.js"></script>

@@ -5,9 +5,11 @@
 # This script is for performing object detection on a raw image from a camera using the Google Tensorflow API based on Faster RCNN
 
 import rospy
-from sensor_msgs.msg import CompressedImage
+from importlib import import_module
+from sensor_msgs.msg import CompressedImage, Image
 from rostensorflow.srv import *
 import cv2
+from cv_bridge import CvBridge
 
 ## TensorFlow related imports
 import numpy as np
@@ -50,11 +52,19 @@ class rostensorflow():
 
         self._session = tf.Session(graph=self.detection_graph)
 
+        self._cv_bridge = CvBridge()
+
         self._img_srv = rospy.Service(self._namespace + '/detect_object/image', ImageDetection, self.handle_image_detection)
         self._json_srv = rospy.Service(self._namespace + '/detect_object/json', JSONDetection, self.handle_json_detection)
         self._label_json_srv = rospy.Service(self._namespace + '/detect_object/labeled_json', JSONDetection, self.handle_labeled_json_detection)
         self._all_srv = rospy.Service(self._namespace + '/detect_object/all', DetectAll, self.handle_detect_all)
         self._all_label_srv = rospy.Service(self._namespace + '/detect_object/all_with_label', DetectAll, self.handle_detect_all_with_label)
+
+        self._img_by_topic_srv = rospy.Service(self._namespace + '/detect_object/by_topic/image', ImageDetectionByTopic, self.handle_image_detection_by_topic)
+        self._json_by_topic_srv = rospy.Service(self._namespace + '/detect_object/by_topic/json', JSONDetectionByTopic, self.handle_json_detection_by_topic)
+        self._label_json_by_topic_srv = rospy.Service(self._namespace + '/detect_object/by_topic/labeled_json', JSONDetectionByTopic, self.handle_labeled_json_detection_by_topic)
+        self._all_by_topic_srv = rospy.Service(self._namespace + '/detect_object/by_topic/all', DetectAllByTopic, self.handle_detect_all_by_topic)
+        self._all_label_by_topic_srv = rospy.Service(self._namespace + '/detect_object/by_topic/all_with_label', DetectAllByTopic, self.handle_detect_all_with_label_by_topic)
 
     def _detection(self, img):
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
@@ -123,6 +133,25 @@ class rostensorflow():
 
         return cmpMsg;
 
+    def _check_message_type(self, topic):
+        msg = rospy.wait_for_message(req.topic, rospy.AnyMsg)
+
+        connection_header =  data._connection_header['type'].split('/')
+        ros_pkg = connection_header[0] + '.msg'
+        msg_type = connection_header[1]
+
+        if msg_type == "CompressedImage" or msg_type == "Image":
+            msg_class = getattr(import_module(ros_pkg), msg_type)
+            image_msg = wait_for_message(req.topic, msg_class)
+
+            if msg_type == "CompressedImage":
+                np_arr = np.fromstring(image_msg.data, np.uint8)
+                return cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+            elif msg_type == "Image":
+                return self._cv_bridge.imgmsg_to_cv2(image_msg, "bgr8")
+        else:
+            return None
+
     def handle_json_detection(self, req):
         np_arr = np.fromstring(req.raw.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -133,6 +162,19 @@ class rostensorflow():
         jsonString = self._get_json(image_np, boxes, scores, classes, num_detections)
 
         return JSONDetectionResponse(jsonString)
+
+    def handle_json_detection_by_topic(self, req):
+        image_np = self._check_message_type(req.topic)
+
+        if not image_np is None:
+            # Detection through model
+            (boxes, scores, classes, num_detections) = self._detection(image_np)
+            # Get JSON Description of Detection
+            jsonString = self._get_json(image_np, boxes, scores, classes, num_detections)
+
+            return JSONDetectionByTopicResponse(jsonString)
+        else:
+            return JSONDetectionByTopicResponse("Error: Message-type is not supported")
 
     def handle_labeled_json_detection(self, req):
         np_arr = np.fromstring(req.raw.data, np.uint8)
@@ -145,6 +187,19 @@ class rostensorflow():
 
         return JSONDetectionResponse(jsonString)
 
+    def handle_labeled_json_detection_by_topic(self, req):
+        image_np = self._check_message_type(req.topic)
+
+        if not image_np is None:
+            # Detection through model
+            (boxes, scores, classes, num_detections) = self._detection(image_np)
+            # Get JSON Description of Detection
+            jsonString = self._get_named_json(image_np, boxes, scores, classes, num_detections)
+
+            return JSONDetectionByTopicResponse(jsonString)
+        else:
+            return JSONDetectionByTopicResponse("Error: Message-type is not supported")
+
     def handle_image_detection(self, req):
         np_arr = np.fromstring(req.raw.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -155,6 +210,19 @@ class rostensorflow():
         imgMsg = self._get_visualized_img(image_np, boxes, scores, classes, num_detections)
 
         return ImageDetectionResponse(imgMsg)
+
+    def handle_image_detection_by_topic(self, req):
+        image_np = self._check_message_type(req.topic)
+
+        if not image_np is None:
+            # Detection through model
+            (boxes, scores, classes, num_detections) = self._detection(image_np)
+            # Visualize Boxes on Image
+            imgMsg = self._get_visualized_img(image_np, boxes, scores, classes, num_detections)
+
+            return ImageDetectionByTopicResponse(imgMsg)
+        else:
+            return ImageDetectionByTopicResponse(CompressedImage())
 
     def handle_detect_all(self, req):
         np_arr = np.fromstring(req.raw.data, np.uint8)
@@ -169,6 +237,21 @@ class rostensorflow():
 
         return DetectAllResponse(imgMsg, jsonString)
 
+    def handle_detect_all_by_topic(self, req):
+        image_np = self._check_message_type(req.topic)
+
+        if not image_np is None:
+            # Detection through model
+            (boxes, scores, classes, num_detections) = self._detection(image_np)
+            # Visualize Boxes on Image
+            imgMsg = self._get_visualized_img(image_np, boxes, scores, classes, num_detections)
+            # Get JSON Description of Detection
+            jsonString = self._get_json(image_np, boxes, scores, classes, num_detections)
+
+            return DetectAllByTopicResponse(imgMsg, jsonString)
+        else:
+            return DetectAllByTopicResponse(CompressedImage(), "Error: Message-type is not supported")
+
     def handle_detect_all_with_label(self, req):
         np_arr = np.fromstring(req.raw.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -181,6 +264,21 @@ class rostensorflow():
         jsonString = self._get_named_json(image_np, boxes, scores, classes, num_detections)
 
         return DetectAllResponse(imgMsg, jsonString)
+
+    def handle_detect_all_with_label_by_topic(self, req):
+        image_np = self._check_message_type(req.topic)
+
+        if not image_np is None:
+            # Detection through model
+            (boxes, scores, classes, num_detections) = self._detection(image_np)
+            # Visualize Boxes on Image
+            imgMsg = self._get_visualized_img(image_np, boxes, scores, classes, num_detections)
+            # Get JSON Description of Detection
+            jsonString = self._get_named_json(image_np, boxes, scores, classes, num_detections)
+
+            return DetectAllByTopicResponse(imgMsg, jsonString)
+        else:
+            return DetectAllByTopicResponse(CompressedImage(), "Error: Message-type is not supported")
 
     def main(self):
         rospy.spin()

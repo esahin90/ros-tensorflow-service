@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python-opencv \
         rsync \
         protobuf-compiler \
-        ros-kinetic-rosbridge-server
+        ros-kinetic-rosbridge-server \
+        ros-kinetic-cv-bridge
 
 RUN  apt-get clean && \
         rm -rf /var/lib/apt/lists/*
