@@ -13,6 +13,8 @@ const server = https.createServer(options, function (req, res) {
   var filename = '';
   if (q.pathname == '/') {
     filename += '/index.html'
+  } else if (q.pathname == '/task') {
+    filename += '.html';
   } else {
     filename += q.pathname;
   }
@@ -21,7 +23,11 @@ const server = https.createServer(options, function (req, res) {
       res.writeHead(404, {'Content-Type': 'text/html'});
       return res.end("404 Not Found");
     }
-    res.writeHead(200, {'Content-Type': 'text/html'});
+    if (filename.endsWith('.css')) {
+      res.writeHead(200, {"Content-Type": "text/css"});
+    } else {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+    }
     res.write(data);
     return res.end();
   });

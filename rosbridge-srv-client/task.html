@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Process overview</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/dark_theme.css" />
+    <script src="/lib/dagre/dagre.min.js"></script>
+    <script src="/lib/interactjs/interact.min.js"></script>
+    <script src="/lib/procvis/procvis.js"></script>
+    <script src="/lib/alertify/alertify.min.js"></script>
+
+    <script src="lib/eventemitter2.min.js"></script>
+    <script src="/lib/roslib.min.js"></script>
+
+    <!-- include the style -->
+    <link rel="stylesheet" href="/lib/alertify/css/alertify.min.css" />
+    <!-- include a theme -->
+    <link rel="stylesheet" href="/lib/alertify/css/themes/bootstrap.min.css" />
+
+  </head>
+  <body>
+    <div id="procvis_graph">
+    </div>
+    <script>
+      var Task = procvis.Task;
+
+      var graph = new procvis.Graph('procvis_graph');
+
+      var start = new procvis.Event(graph, "start");
+
+      var task1 = new Task(graph, 'Task 1 <span class="emoji">✔</span>', {'state': 'done'});
+      var task2 = new Task(graph, 'Task 2 <span class="emoji">🔧</span>', {'state': 'in_progress'});
+      var task3 = new Task(graph, 'Task 3 <span class="emoji">⌛</span>', {'state': 'planned'});
+
+      var end = new procvis.Event(graph, "end");
+
+      start.connect(task1);
+      task1.connect(task2);
+      task2.connect(task3);
+      task3.connect(end);
+
+      graph.layout();
+
+      // TODO: websocket connection
+    </script>
+    <script src="js/ros_interaction.js"></script>
+  </body>
+</html>

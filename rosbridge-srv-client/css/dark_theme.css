@@ -1,0 +1,157 @@
+/* default node - with round edges */
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background: #253640;
+  height: 100%;
+  color: #00ffff;
+}
+
+.task.done {
+  background-color: #71f369;
+  color: black;
+}
+
+.task.in_progress {
+  color: black;
+  animation: pulse_progress 2s ease infinite;
+  -webkit-animation: pulse_progress 2s ease infinite;
+}
+
+.task.error {
+  color: black;
+  animation: pulse_error .5s ease infinite;
+  -webkit-animation: pulse_error .5s ease infinite;
+}
+
+@keyframes pulse_progress {
+  0%, 100% {
+    background-color: #f1f369;
+  }
+  50% {
+    background-color: #f7c657;
+  }
+}
+
+@keyframes pulse_error {
+  0%, 100% {
+    background-color: #b30000;
+  }
+  50% {
+    background-color: #ff4f28;
+  }
+}
+
+.task {
+  display: block;
+  border-radius: .75em;
+  background-color: black;
+  position: absolute;
+  border: 2px solid #7c93a1;
+  width: 150px;
+  height: 100px;
+}
+
+.event {
+  display: block;
+  border-radius: 30px;
+  background-color: black;
+  position: absolute;
+  width: 30px;
+  margin-left: 20px;
+  height: 30px;
+}
+
+.event.end {
+  border: 4px solid #7c93a1;
+  top: 34px;
+}
+
+.event.start {
+  border: 2px solid #7c93a1;
+  top: 36px;
+}
+
+.event .connector {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+/* horizontal and vertical center content */
+.task .node_content {
+  position: relative;
+  float: left;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+/* default node - with round edges */
+.task.preview {
+  border-style: dashed;
+}
+
+.task .connector {
+  position: absolute;
+  border: solid 1px #aaa;
+  background-color: black;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+}
+
+.task .connector.output {
+  right: -10px;
+  top: 40px;
+}
+
+.task .connector.input {
+  left: -10px;
+  top: 40px;
+}
+
+.edge {
+  stroke: #bbbbbb;
+  stroke-width: 4px;
+  marker-end:url(#Arrow2Lend);
+}
+
+.toolbar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+
+  background: #fafafa;
+  border: solid 1px #cccccc;
+  border-radius: 2px;
+}
+
+.toolbar.one-column {
+  width: 50px;
+}
+
+.toolbar.two-column {
+  width: 100px;
+}
+
+.tool a {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(0,0,0,0);
+  display: block;
+}
+
+.tool.selected {
+  background-color: #d9ffd9;
+}
+
+.tool.selected a {
+  border: 1px solid black;
+}

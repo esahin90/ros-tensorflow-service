@@ -1,0 +1,44 @@
+body {
+  font-family: sans-serif;
+}
+#procvis_graph {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+}
+svg{
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:-100;
+  width:100%;
+  height:100%;
+}
+
+/* Prevent the text contents of draggable elements from being selectable. */
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+}
+
+/* touch input on internet explorer */
+.draggable {
+    -ms-touch-action: none;
+        touch-action: none;
+}
+#Arrow2LendPath {
+  stroke:#bbbbbb;
+  stroke-opacity:1;
+  fill:#bbbbbb;
+  fill-opacity:1
+}
+.emoji {
+  font-family: apple color emoji,segoe ui emoji,noto color emoji,android emoji,emojisymbols,emojione mozilla,twemoji mozilla,segoe ui symbol;
+}
