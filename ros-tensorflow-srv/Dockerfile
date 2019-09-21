@@ -7,9 +7,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libpng12-dev \
         libzmq3-dev \
+	nano \
         pkg-config \
         python \
         python-dev \
+	python-pip \
         python-numpy \
         python-scipy \
         python-pil \
@@ -18,23 +20,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         rsync \
         protobuf-compiler \
         ros-kinetic-rosbridge-server \
-	ros-kinetic-image-view
+	ros-kinetic-image-view \
+	ros-kinetic-compressed-image-transport
 
 RUN  apt-get clean && \
         rm -rf /var/lib/apt/lists/*
 
-RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
-        python get-pip.py && \
-        rm get-pip.py
+RUN pip install --upgrade pip enum34 setuptools
 
 RUN pip --no-cache-dir install \
-        http://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.2.0-cp27-none-linux_x86_64.whl
+	https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.3.0-cp27-none-linux_x86_64.whl
+
+RUN pip install --upgrade np_utils
+RUN pip install --upgrade tf-nightly
+RUN pip install --upgrade keras
 
 COPY app /app
 
 # Setup catkin workspace
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
-                  chmod +x /app/catkin_ws/src/rostensorflow/scripts/object_detection.py && \
+                  chmod +x /app/catkin_ws/src/rostensorflow/scripts/keras.py && \
                   chmod +x /app/run.sh && \
                   cd /app/catkin_ws/src/rostensorflow/scripts && \
                   protoc object_detection/protos/*.proto --python_out=. && \
@@ -47,5 +52,7 @@ EXPOSE 6006
 EXPOSE 9090
 
 WORKDIR "/"
+
+ENV PYTHONPATH "/opt/ros/kinetic/lib/python2.7/dist-packages:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages"
 
 CMD ["/app/run.sh"]

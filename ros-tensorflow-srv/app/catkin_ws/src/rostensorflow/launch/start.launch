@@ -5,5 +5,5 @@
     <arg name="certfile" value="/app/cert/certificate.pem"/>
     <arg name="keyfile" value="/app/cert/privateKey.pem"/>
 	</include>
-  <node name="rostensorflow" pkg="rostensorflow" type="object_detection.py" output="screen"/>
+  <node name="rostensorflow" pkg="rostensorflow" type="keras.py" output="screen"/>
 </launch>
