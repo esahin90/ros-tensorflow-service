@@ -55,6 +55,12 @@ var req = new ROSLIB.ServiceRequest({
   raw : imageMessage
 });
 
+var imageTopic = new ROSLIB.Topic({
+  ros : ros,
+  name : '/camera/image/compressed',
+  messageType : 'sensor_msgs/CompressedImage'
+});
+
 document.getElementById('startstopicon').setAttribute('src', RECORD_OFF);
 
 var hasRunOnce = false,
@@ -197,14 +203,16 @@ function takepicture() {
 
   imageMessage.data = canvas.toDataURL('image/jpeg').replace("data:image/jpeg;base64,", "");
 
-  detectObjectsClient.callService(req, function(resp) {
+/*  detectObjectsClient.callService(req, function(resp) {
     if (resp.result) {
       image.src = "data:image/" + resp.result.format +";base64," + resp.result.data;
     }
     if (resp.json_string) {
       output_json.innerHTML = resp.json_string;
     }
-  });
+  });*/
+
+  imageTopic.publish(imageMessage);
 }
 
 startstopicon.addEventListener('click', function(ev) {
@@ -219,7 +227,7 @@ startstopicon.addEventListener('click', function(ev) {
     cameraOn();
     cameraTimer = setInterval(function() {
       takepicture();
-    }, 400);
+    }, 250);
     document.getElementById('startstopicon').setAttribute('src', RECORD_ON);
   } else {
     ros.close();
