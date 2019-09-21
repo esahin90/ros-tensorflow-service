@@ -1,0 +1,24 @@
+version: "2"
+services:
+  node:
+    image: "node:10"
+    user: "node"
+    network_mode: host
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./rosbridge-srv-client:/home/node/app
+    ports:
+      - "8888:8888"
+    command:
+      bash -c "cd /home/node/app && npm install && npm start"
+
+      #  ros-tensorflow:
+      #    build:
+      #      context: ./ros-tensorflow-srv
+      #      dockerfile: Dockerfile
+      #    expose:
+      #      - "9090"
+      #    ports:
+      #      - "9090:9090"
