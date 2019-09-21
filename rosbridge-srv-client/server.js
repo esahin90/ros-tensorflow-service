@@ -34,7 +34,7 @@ const server = https.createServer(options, function (req, res) {
                         '.gif' : 'image/gif',
                         '.css' : 'text/css',
                         '.js' : 'text/javascript'
-                        }[ request.url.substr(dotoffset) ];
+                      }[ filename.substr(dotoffset) ];
     res.writeHead(200, {"Content-Type": mimetype});
     res.write(data);
     return res.end();

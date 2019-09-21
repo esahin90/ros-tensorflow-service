@@ -11,7 +11,8 @@ ros.connect("wss://" + window.location.hostname + ":9090", {
   rejectUnauthorized: false
 });
 
-function showErrorMsg() {
+function showErrorMsg(task) {
+  task = task ? task : task2;
   let errMsg = '<h2><span class="emoji">⚠</span>FEHLERFALL</h2>Warnung! FEUER!<br>';
   errMsg += '<br />Manager benachrichtigt!<br />Techniker beauftragt!';
   alertify.error(errMsg, 0);
