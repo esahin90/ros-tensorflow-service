@@ -23,11 +23,19 @@ const server = https.createServer(options, function (req, res) {
       res.writeHead(404, {'Content-Type': 'text/html'});
       return res.end("404 Not Found");
     }
-    if (filename.endsWith('.css')) {
-      res.writeHead(200, {"Content-Type": "text/css"});
-    } else {
-      res.writeHead(200, {'Content-Type': 'text/html'});
-    }
+    var dotoffset = filename.lastIndexOf('.');
+    var mimetype = dotoffset == -1
+                    ? 'text/plain'
+                    : {
+                        '.html' : 'text/html',
+                        '.ico' : 'image/x-icon',
+                        '.jpg' : 'image/jpeg',
+                        '.png' : 'image/png',
+                        '.gif' : 'image/gif',
+                        '.css' : 'text/css',
+                        '.js' : 'text/javascript'
+                        }[ request.url.substr(dotoffset) ];
+    res.writeHead(200, {"Content-Type": mimetype});
     res.write(data);
     return res.end();
   });

@@ -29,9 +29,9 @@
 
       var start = new procvis.Event(graph, "start");
 
-      var task1 = new Task(graph, 'Task 1 <span class="emoji">✔</span>', {'state': 'done'});
-      var task2 = new Task(graph, 'Task 2 <span class="emoji">🔧</span>', {'state': 'in_progress'});
-      var task3 = new Task(graph, 'Task 3 <span class="emoji">⌛</span>', {'state': 'planned'});
+      var task1 = new Task(graph, 'Landeklappe anbringen <span class="emoji">✔</span>', {'state': 'done'});
+      var task2 = new Task(graph, 'Vorflügel <br />montieren <span class="emoji">🔧</span>', {'state': 'in_progress'});
+      var task3 = new Task(graph, 'Triebwerk <br />anbringen <span class="emoji">⌛</span>', {'state': 'planned'});
 
       var end = new procvis.Event(graph, "end");
 
@@ -42,7 +42,6 @@
 
       graph.layout();
 
-      // TODO: websocket connection
     </script>
     <script src="js/ros_interaction.js"></script>
   </body>

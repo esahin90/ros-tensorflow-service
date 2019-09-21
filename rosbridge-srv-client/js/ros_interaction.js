@@ -10,3 +10,10 @@ ros.connect("wss://" + window.location.hostname + ":9090", {
   origin: "https://" + window.location.hostname + ":8888",
   rejectUnauthorized: false
 });
+
+function showErrorMsg() {
+  let errMsg = '<h2><span class="emoji">⚠</span>FEHLERFALL</h2>Warnung! FEUER!<br>';
+  errMsg += '<br />Manager benachrichtigt!<br />Techniker beauftragt!';
+  alertify.error(errMsg, 0);
+  task2.domElement.classList.add('error');
+}

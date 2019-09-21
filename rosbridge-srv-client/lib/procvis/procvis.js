@@ -752,10 +752,6 @@ var Task = function (_Node) {
         domElement.classList.add(this.options.state);
       }
       this.content.innerHTML = this.label;
-      domElement.addEventListener('click', function () {
-        alertify.error('<span class="emoji">⚠</span> Error notification message.');
-        domElement.classList.add('error');
-      });
     }
 
     /**
